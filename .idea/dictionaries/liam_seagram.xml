@@ -1,16 +1,40 @@
 <component name="ProjectDictionaryState">
   <dictionary name="liam_seagram">
     <words>
+      <w>alterra</w>
+      <w>angleseasy</w>
+      <w>angleshard</w>
       <w>backheight</w>
       <w>backwidth</w>
+      <w>bglist</w>
       <w>clickto</w>
+      <w>depthpaths</w>
+      <w>depthpathslist</w>
+      <w>depthpathslistforeal</w>
       <w>exitgame</w>
+      <w>fontdir</w>
       <w>gamedisplay</w>
+      <w>getbackground</w>
+      <w>getscore</w>
       <w>handlekeys</w>
+      <w>highscore</w>
+      <w>iconsmall</w>
+      <w>imageleft</w>
+      <w>imagemove</w>
+      <w>imageright</w>
       <w>lastkey</w>
+      <w>leviathanattributes</w>
+      <w>leviathanchance</w>
+      <w>leviathantype</w>
       <w>maingame</w>
+      <w>midtop</w>
       <w>pygame</w>
+      <w>roundeddepth</w>
+      <w>savescore</w>
       <w>seamoth</w>
+      <w>speedseasy</w>
+      <w>speedshard</w>
+      <w>willyoudie</w>
       <w>xpos</w>
       <w>ypos</w>
     </words>
