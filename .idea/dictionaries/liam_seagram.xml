@@ -21,6 +21,7 @@
       <w>depthpaths</w>
       <w>depthpathslist</w>
       <w>depthpathslistforeal</w>
+      <w>despawns</w>
       <w>exitgame</w>
       <w>fontdir</w>
       <w>fullstop</w>
@@ -30,10 +31,13 @@
       <w>ghostbackgrounds</w>
       <w>handlekeys</w>
       <w>highscore</w>
+      <w>highscores</w>
+      <w>hitboxes</w>
       <w>iconsmall</w>
       <w>imageleft</w>
       <w>imagemove</w>
       <w>imageright</w>
+      <w>indexerror</w>
       <w>lastkey</w>
       <w>leftorright</w>
       <w>leviathanattributes</w>
@@ -59,6 +63,7 @@
       <w>speedseasy</w>
       <w>speedshard</w>
       <w>suoer</w>
+      <w>teleporting</w>
       <w>willyoudie</w>
       <w>xpos</w>
       <w>ypos</w>

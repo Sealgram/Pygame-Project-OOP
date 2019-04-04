@@ -3,7 +3,6 @@
 
 import pygame, random, time
 # imports needed modules into the game
-leviathansactive = 0
 # global variable is defined for how many leviathans (the enemy) are active in my game.
 
 '''
@@ -18,7 +17,7 @@ class Seamoth(pygame.sprite.Sprite):
         # init function within the class including all parameters
         super().__init__()
         # initiating super, which allows us to avoid directly referencing the base class (where it is specified that
-        # this class is a pygame sprite)
+        # this class is a pygame sprite, taking the pygame native )
         self.imageleft = pygame.image.load('Assets/Sprites/seamoth.png').convert_alpha()
         self.imageleft = pygame.transform.scale(self.imageleft, (80, 46))
         self.imageright = pygame.transform.flip(self.imageleft, True, False)
@@ -320,40 +319,60 @@ def start_menu():
             if event.type == pygame.KEYDOWN:
                 crashed = True
                 exitgame = False
-                # if the player presses any key (press any key to begin) closes this windoww  and begins the next one.)
+                # if the player presses any key (press any key to begin) closes this window and begins the next one.)
         pygame.display.flip()
         # flips the display
         clock.tick(60)
         # ticks the pygame clock 60
-    maingame(exitgame)
+    if exitgame:
+        quit()
+        # if the exitgame value is true (the player pressed the red x), the code quits
+    maingame()
     # once the loop is broken, calls the maingame function with the parameter exitgame
 
 
-def maingame(exitgame):
-    global leviathansactive
-    if exitgame:
-        exit()
+'''
+The following function is the function that contains the main interface and functionality of the game, including the
+spawning and controlling of sprites, and the functionality to keep score, change the backgrounds, and collide with the
+enemy sprites, thus losing the game.
+'''
+
+
+def maingame():
+    leviathansactive = 0
+    # defining the active leviathans variable for later use
     pygame.init()
+    # initiating pygame
     display_width = 960
     display_height = 540
     gamedisplay = pygame.display.set_mode((display_width, display_height))
+    # defining the gamedisplay with the defined width and height variables
     white = (255, 255, 255)
+    # defining white's RGB color code for later use
     background = pygame.image.load('Assets/backgrounds/1. First Depth 1.png')
     background = pygame.transform.scale(background, (960, 540))
+    # loading the first background and scaling it accordingly
     pygame.display.set_caption('Reaper')
     font_name = 'Helvetica'
     icon = pygame.image.load('Assets/General/alterra logo.png')
     pygame.display.set_icon(icon)
+    # setting the caption, font name, and icon
     explosion = pygame.image.load('Assets/General/explosion.png')
     iconsmall = pygame.transform.scale(icon, (100, 100))
+    # loading the image for an explosion when the sprite gets hit by the reaper
     pygame.mixer.music.load('Assets/SoundEffects/Abandon Ship.mp3')
     pygame.mixer.music.play(-1)
+    # loading and playing the background music
     xpos = 10
     ypos = 100
+    # setting the initial start and finish point for the seamoth sprite
     seamoth = Seamoth(xpos, ypos, True)
+    # calling the seamoth sprite to it's initial position
     all_sprites_list = pygame.sprite.Group()
     all_sprites_list.add(seamoth)
+    # defining all_sprites_list and adding the seamoth to it
     clock = pygame.time.Clock()
+    # defining the clock
     crashed = False
     lastkey = 0
     depth = 0
@@ -367,72 +386,117 @@ def maingame(exitgame):
     leftorright = random.randint(0, 1)
     attributes = leviathanattributes(depth)
     deathvia = 'Reaper'
+    wait = 0
+    # defining all necessary variables for later use in the code
     while not crashed:
+        # while loop containing main game
         gamedisplay.blit(background, (0, 0))
         gamedisplay.blit(iconsmall, (5, 5))
+        # blits the background and icon on to the game display
         for event in pygame.event.get():
+            # for loop that gets the current pygame 'event'
             if event.type == pygame.QUIT:
-                crashed = True
+                exit()
+                # if the player presses the red x button, exits the code
             if event.type == pygame.KEYDOWN:
+                # if the event is pressing a key, moves in to handle those specific keys
                 if event.key == pygame.K_RIGHT:
                     lastkey = 0
                     orientation = True
+                    # if the player presses the right key, defines lastkey as zero (moving the sprite right)
+                    # and faces the sprite right by defining orientation as true
                 elif event.key == pygame.K_LEFT:
                     lastkey = 1
                     orientation = False
+                    # if the player presses the left key, defines lastkey as 1 (moving the sprite left)
+                    # and faces the sprite left by defining orientation as False
                 elif event.key == pygame.K_UP:
                     speed += 2.5
+                    # if the player presses the up arrow, accelerates the sprite by increasing the 'speed' variable
                 elif event.key == pygame.K_DOWN:
                     speed -= 2.5
+                    # if the player presses the down arrow, decelerates the sprite by decreasing the 'speed' variable
         if speed > 15:
             speed = 15
         elif speed < 5:
             speed = 5
+        # two if statements that make sure the player cannot accelerate past 15 or decelerate under 5
         if lastkey == 0:
             xpos += speed
+            # if the lastkey is zero, adds the current speed to the x position, moving the sprite right
         else:
             xpos -= speed
+            # if the lastkey is 1, subtracts the current speed from the x position, moving the sprite left
         ypos += 5
+        # moves the sprite down 5
         if xpos > display_width - 80:
             lastkey = 1
             orientation = False
+            # if the sprite touches the far right side of the display, turns the sprite left
         elif xpos < 0:
             lastkey = 0
             orientation = True
+            # if the sprite touches the far left side of the display, turns the sprite right
         all_sprites_list.remove(seamoth)
+        # removes the last seamoth from the sprites list
         seamoth = Seamoth(xpos, ypos, orientation)
+        # redefines seamoth with the new variables
         if leviathansactive == 0:
+            # if there are no leviathans active, triggers the chance to activate a leviathan
             leftorright = random.randint(0, 1)
+            # decides randomly if the leviathan will face left or right
             attributes = leviathanattributes(depth)
+            # gets the leviathan attributes based on depth
             levxpos = random.randint(1, 500)
+            # randomly decides where on the x axis the leviathan will spawn
             if depth > 50:
                 willyoudie = leviathanchance(depth)
+                # if you are below 50 metres, gets the chance for a leviathan to spawn based on depth
         if willyoudie == 1:
             leviathansactive = 1
+            # if the leviathan chance rolled a 1, activates a leviathan, and makes sure leviathansactive == 1 so that
+            # the attributes being used for the leviathan will not be rerolled as it is active.
             if attributes[2] == 'Reaper':
+                # if the attributes function rolled that the leviathan will be a reaper, activates the if statement for
+                # the reaper leviathan.
                 try:
                     all_sprites_list.remove(reaper)
                 except IndexError:
                     continue
+                # tries to remove the previous reaper from all_sprites_list- if this is the first time this is looped
+                # while the reaper is active, this will cause an indexerror, hence the try and except.
                 levspeed = attributes[0]
                 angle = attributes[1]
+                # defines the speed and movement to the left or right each loop as the attributes returned by the
+                # attributes function.
                 reaper = Reaper(levxpos, levypos, leftorright)
+                # defines the reaper class with the new attributes
                 all_sprites_list.add(reaper)
+                # adds the reaper to the all_sprites_list
                 if leftorright == 0:
                     levxpos -= angle
+                    # if the reaper is travelling left, subtracts the angle from the x position
                 else:
                     levxpos += angle
+                    # if the reaper is travelling right, adds the angle to the x position
                 levypos -= levspeed
-                if pygame.sprite.collide_circle_ratio(0.5)(reaper, seamoth):
+                # subtracts the leviathan's speed from the levypos variable
+                if pygame.sprite.collide_circle_ratio(0.6)(reaper, seamoth):
+                    # if the seamoth and reaper collide (their hitboxes are circles), begins the if statement to handle
+                    # when you loose the game.
                     gamedisplay.blit(explosion, (xpos, ypos))
-                    time.sleep(0.5)
-                    leviathansactive = 0
-                    deathvia = 'Reaper'
-                    crashed = True
+                    # blits the explosion under the seamoth sprite, to show the player that they exploded
+                    if wait == 1:
+                        leviathansactive = 0
+                        deathvia = 'Reaper'
+                        crashed = True
+                    wait += 1
+                    # waits one loop of the code so that the player will see the explosion before ending the game
                 if levypos < 0 - 209 or levxpos < 0 - 300 or levxpos > display_width:
                     leviathansactive = 0
                     levxpos = random.randint(1, 500)
                     levypos = display_height
+                    # if leviathan goes off the screen in any direction, despawns it to make room for a new leviathan
             elif attributes[2] == 'Ghost':
                 try:
                     all_sprites_list.remove(ghost)
@@ -449,14 +513,19 @@ def maingame(exitgame):
                 levypos -= levspeed
                 if pygame.sprite.collide_circle_ratio(0.5)(ghost, seamoth):
                     gamedisplay.blit(explosion, (xpos, ypos))
-                    time.sleep(0.5)
-                    leviathansactive = 0
-                    deathvia = 'Ghost'
-                    crashed = True
+                    if wait == 1:
+                        leviathansactive = 0
+                        deathvia = 'Ghost'
+                        crashed = True
+                    wait += 1
                 if levypos < 0 - 354 or levxpos < 0 - 620 or levxpos > display_width:
                     leviathansactive = 0
                     levxpos = random.randint(1, 500)
                     levypos = display_height
+            # the entire if statement prior to this comment is almost identical to the if statement above it, except it
+            # is for the other leviathan, the ghost. The only reason I didn't put it in a function is that you need to
+            # call different classes, which meant I needed to write the whole thing again, with the only difference
+            # being that every occurrence of the word 'reaper' or 'Reaper' is replaced with 'ghost' or 'Ghost'.
         if ypos > display_height - 46:
             ypos = 0
             background = getbackground(depth, random.randint(0, 3))
@@ -472,21 +541,37 @@ def maingame(exitgame):
                 continue
             levxpos = random.randint(1, 500)
             levypos = display_height
+            # when the player hits the bottom of the screen, despawns any active leviathan and resets them, also
+            # teleporting the player to the top of the screen and getting a new background.
         if depth < 20:
             instruction1 = 'Use the Arrow keys to go Left and Right!'
             draw_text(gamedisplay, instruction1, 25, white, font_name, display_width/2, 75)
         if 25 < depth < 45:
             instruction2 = 'Use the Up and Down arrows to Accelerate and Decelerate!'
             draw_text(gamedisplay, instruction2, 25, white, font_name, display_width / 2, 75)
+        # the past 2 if statements display the instructions while the player is still in the safe depth (0-50)
         depth += 1
+        # adds 1 to depth for each iteration of the loop
         all_sprites_list.add(seamoth)
+        # adds the seamoth to the sprites list
         all_sprites_list.draw(gamedisplay)
+        # draws all the sprites in the all_sprites_list to the game display.
         draw_text(gamedisplay, str(depth), 40, white, font_name, display_width / 2, 25)
+        # draws the depth onto the game display
         pygame.display.flip()
         clock.tick(60)
+        # flips the display and ticks the clock by 60
     pygame.mixer.music.stop()
+    # once the loop ends, stops the music
     savescore(depth)
+    # saves the score to the highscore document
     you_dead(deathvia, depth)
+    # calls the death screen function with the parameters for what killed you, and how deep you got.
+
+
+'''
+The following function is the 
+'''
 
 
 def you_dead(deathvia, depth):
