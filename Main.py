@@ -1,7 +1,15 @@
-# Imports:
-import pygame, random, time, math
-from multiprocessing import Process
-tick = 0
+# Note That all comments are referencing the line/lines directly above them. Block comments reference the functions
+# and classes directly below them.
+
+import pygame, random, time
+# imports needed modules into the game
+leviathansactive = 0
+# global variable is defined for how many leviathans (the enemy) are active in my game.
+
+
+'''
+The below class is created for my player sprite, the seamoth
+'''
 
 
 class Seamoth(pygame.sprite.Sprite):
@@ -20,30 +28,30 @@ class Seamoth(pygame.sprite.Sprite):
 
 
 class Reaper(pygame.sprite.Sprite):
-    def __init__(self, x, y, move):
+    def __init__(self, x, y, orientation):
         super().__init__()
-        self.imagemove1 = pygame.image.load('Assets/Sprites/Reaper Leviathan.png')
-        self.imagemove1 = pygame.transform.scale(self.imagemove1, (300, 209))
-        self.imagemove2 = pygame.transform.rotate(self.imagemove1, 20)
-        if move:
-            self.image = self.imagemove1
+        self.imageleft = pygame.image.load('Assets/Sprites/Reaper Leviathan.png')
+        self.imageleft = pygame.transform.scale(self.imageleft, (300, 209))
+        self.imageright = pygame.transform.flip(self.imageleft, True, False)
+        if orientation == 1:
+            self.image = self.imageright
         else:
-            self.image = self.imagemove2
+            self.image = self.imageleft
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
 
 
 class Ghost(pygame.sprite.Sprite):
-    def __init__(self, x, y, move):
+    def __init__(self, x, y, orientation):
         super().__init__()
-        self.imagemove1 = pygame.image.load('Assets/Sprites/Ghost Leviathan.png')
-        self.imagemove1 = pygame.transform.scale(self.imagemove1, (300, 209))
-        self.imagemove2 = pygame.transform.rotate(self.imagemove1, 20)
-        if move:
-            self.image = self.imagemove1
+        self.imageleft = pygame.image.load('Assets/Sprites/Ghost Leviathan.png')
+        self.imageleft = pygame.transform.scale(self.imageleft, (300, 209))
+        self.imageright = pygame.transform.flip(self.imageleft, True, False)
+        if orientation == 1:
+            self.image = self.imageright
         else:
-            self.image = self.imagemove2
+            self.image = self.imageleft
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -53,45 +61,47 @@ def leviathanchance(depth):
     if depth < 50:
         chance = 0
     elif 50 < depth < 150:
-        chance = random.randint(0, 8)
+        chance = random.randint(0, 15)
     elif 150 < depth < 300:
-        chance = random.randint(0, 5)
+        chance = random.randint(0, 10)
     elif 300 < depth < 450:
-        chance = random.randint(0, 3)
+        chance = random.randint(0, 8)
     elif 450 < depth < 600:
-        chance = random.randint(0, 2)
+        chance = random.randint(0, 4)
     elif depth > 600:
         chance = random.randint(0, 1)
     else:
-        chance = random.randint(0, 1)
+        chance = 1
     return chance
 
 
 def leviathanattributes(depth):
-    angleseasy = [90, 80, 100]
-    angleshard = [100, 80, 70, 120]
-    speedseasy = [4, 6, 8]
-    speedshard = [8, 10, 12, 15]
-    if 50 < depth < 150:
+    angleseasy = [0, 2, 4]
+    angleshard = [6, 8, 12]
+    speedseasy = [6, 10, 14]
+    speedshard = [16, 18, 20]
+    levtypes1 = ['Reaper', 'Reaper', 'Ghost']
+    levtypes2 = ['Ghost', 'Ghost', 'Reaper']
+    if depth < 150:
         speed = random.choice(speedseasy)
         angle = random.choice(angleseasy)
         leviathantype = 'Reaper'
-    elif 150 < depth < 300:
+    elif depth < 150:
         speed = random.choice(speedseasy)
         angle = random.choice(angleseasy)
         leviathantype = 'Reaper'
-    elif 300 < depth < 450:
+    elif depth < 300:
         speed = random.choice(speedshard)
         angle = random.choice(angleshard)
         leviathantype = 'Reaper'
-    elif 450 < depth < 600:
+    elif depth < 450:
         speed = random.choice(speedshard)
         angle = random.choice(angleshard)
-        leviathantype = 'Ghost'
-    elif depth > 600:
+        leviathantype = random.choice(levtypes1)
+    elif depth < 600:
         speed = random.choice(speedshard)
         angle = random.choice(angleshard)
-        leviathantype = 'Ghost'
+        leviathantype = random.choice(levtypes2)
     else:
         speed = random.choice(speedshard)
         angle = random.choice(angleshard)
@@ -99,15 +109,28 @@ def leviathanattributes(depth):
     return [speed, angle, leviathantype]
 
 
+def roar(roartype):
+    reaper_roar = pygame.mixer.Sound("Assets/SoundEffects/Reaper Roar.wav")
+    ghost_roar = pygame.mixer.Sound("Assets/SoundEffects/Ghost Roar.wav")
+    if roartype == 'Reaper':
+        pygame.mixer.Sound.play(reaper_roar)
+        pygame.mixer.music.stop()
+    elif roartype == 'Ghost':
+        pygame.mixer.Sound.play(ghost_roar)
+        pygame.mixer.music.stop()
+
+
 def getscore():
     stored = open('Highscore', 'r')
     score = stored.read().strip()
-    return score
+    return int(score)
 
 
 def savescore(score):
-    stored = open('Highscore', 'w')
-    stored.write(score)
+    scoresaved = getscore()
+    if score > scoresaved:
+        stored = open('Highscore', 'w')
+        stored.write(str(score))
 
 
 def getbackground(depth, iteration):
@@ -150,11 +173,13 @@ def start_menu():
     display_width = 960
     display_height = 540
     white = (255, 255, 255)
-    backgrounds = ['Assets/Backgrounds/4. Fourth Depth 1.png',
-                   'Assets/Backgrounds/4. Fourth Depth 2.png',
-                   'Assets/Backgrounds/4. Fourth Depth 3.png']
+    backgrounds = ['Assets/Backgrounds/loadingscreen1.jpg',
+                   'Assets/Backgrounds/loadingscreen2.jpg',
+                   'Assets/Backgrounds/loadingscreen3.png',
+                   'Assets/Backgrounds/loadingscreen4.jpg']
     background = pygame.image.load(random.choice(backgrounds))
-    background = pygame.transform.scale(background, (960, 540))
+    pygame.mixer.music.load('Assets/SoundEffects/Salutations.mp3')
+    pygame.mixer.music.play(-1)
     title = pygame.image.load('Assets/General/Title.png')
     start = pygame.image.load('Assets/General/ClicktoStart.png')
     highscore = pygame.image.load('Assets/General/Highscore.png')
@@ -185,6 +210,7 @@ def start_menu():
 
 
 def maingame(exitgame):
+    global leviathansactive
     if exitgame:
         exit()
     pygame.init()
@@ -198,7 +224,10 @@ def maingame(exitgame):
     font_name = 'Helvetica'
     icon = pygame.image.load('Assets/General/alterra logo.png')
     pygame.display.set_icon(icon)
+    explosion = pygame.image.load('Assets/General/explosion.png')
     iconsmall = pygame.transform.scale(icon, (100, 100))
+    pygame.mixer.music.load('Assets/SoundEffects/Abandon Ship.mp3')
+    pygame.mixer.music.play(-1)
     xpos = 10
     ypos = 100
     seamoth = Seamoth(xpos, ypos, True)
@@ -207,10 +236,17 @@ def maingame(exitgame):
     clock = pygame.time.Clock()
     crashed = False
     lastkey = 0
-    iteration = 0
     depth = 0
     speed = 10
+    ghost = 0
+    reaper = 0
+    willyoudie = 0
     orientation = True
+    levxpos = display_width / 2
+    levypos = display_height
+    leftorright = random.randint(0, 1)
+    attributes = leviathanattributes(depth)
+    deathvia = 'Reaper'
     while not crashed:
         gamedisplay.blit(background, (0, 0))
         gamedisplay.blit(iconsmall, (5, 5))
@@ -243,36 +279,146 @@ def maingame(exitgame):
         elif xpos < 0:
             lastkey = 0
             orientation = True
+        all_sprites_list.remove(seamoth)
+        seamoth = Seamoth(xpos, ypos, orientation)
+        if leviathansactive == 0:
+            leftorright = random.randint(0, 1)
+            attributes = leviathanattributes(depth)
+            levxpos = random.randint(1, 500)
+            if depth > 50:
+                willyoudie = leviathanchance(depth)
+        if willyoudie == 1:
+            leviathansactive = 1
+            if attributes[2] == 'Reaper':
+                try:
+                    all_sprites_list.remove(reaper)
+                except IndexError:
+                    continue
+                levspeed = attributes[0]
+                angle = attributes[1]
+                reaper = Reaper(levxpos, levypos, leftorright)
+                all_sprites_list.add(reaper)
+                if leftorright == 0:
+                    levxpos -= angle
+                else:
+                    levxpos += angle
+                levypos -= levspeed
+                if pygame.sprite.collide_circle_ratio(0.5)(reaper, seamoth):
+                    gamedisplay.blit(explosion, (xpos, ypos))
+                    time.sleep(0.5)
+                    leviathansactive = 0
+                    deathvia = 'Reaper'
+                    crashed = True
+                if levypos < 0 - 209 or levxpos < 0 - 300 or levxpos > display_width:
+                    leviathansactive = 0
+                    levxpos = random.randint(1, 500)
+                    levypos = display_height
+            elif attributes[2] == 'Ghost':
+                try:
+                    all_sprites_list.remove(ghost)
+                except IndexError:
+                    continue
+                levspeed = attributes[0]
+                angle = attributes[1]
+                ghost = Ghost(levxpos, levypos, leftorright)
+                all_sprites_list.add(ghost)
+                if leftorright == 0:
+                    levxpos -= angle
+                else:
+                    levxpos += angle
+                levypos -= levspeed
+                if pygame.sprite.collide_circle_ratio(0.5)(ghost, seamoth):
+                    gamedisplay.blit(explosion, (xpos, ypos))
+                    time.sleep(0.5)
+                    leviathansactive = 0
+                    deathvia = 'Ghost'
+                    crashed = True
+                if levypos < 0 - 354 or levxpos < 0 - 620 or levxpos > display_width:
+                    leviathansactive = 0
+                    levxpos = random.randint(1, 500)
+                    levypos = display_height
         if ypos > display_height - 46:
             ypos = 0
-            iteration += 1
-            if iteration == 4:
-                iteration = 0
-            background = getbackground(depth, iteration)
-        if depth > 50:
-            willyoudie = leviathanchance(depth)
-        else:
+            background = getbackground(depth, random.randint(0, 3))
             willyoudie = 0
-        if willyoudie == 1:
-            attributes = leviathanattributes(depth)
-
-
+            leviathansactive = 0
+            try:
+                all_sprites_list.remove(reaper)
+            except IndexError:
+                continue
+            try:
+                all_sprites_list.remove(ghost)
+            except IndexError:
+                continue
+            levxpos = random.randint(1, 500)
+            levypos = display_height
         if depth < 20:
             instruction1 = 'Use the Arrow keys to go Left and Right!'
             draw_text(gamedisplay, instruction1, 25, white, font_name, display_width/2, 75)
         if 25 < depth < 45:
             instruction2 = 'Use the Up and Down arrows to Accelerate and Decelerate!'
             draw_text(gamedisplay, instruction2, 25, white, font_name, display_width / 2, 75)
-        depth += 0.4
-        roundeddepth = math.ceil(depth)
-        all_sprites_list.remove(seamoth)
-        seamoth = Seamoth(xpos, ypos, orientation)
+        depth += 1
         all_sprites_list.add(seamoth)
         all_sprites_list.draw(gamedisplay)
-        draw_text(gamedisplay, str(roundeddepth), 40, white, font_name, display_width / 2, 25)
+        draw_text(gamedisplay, str(depth), 40, white, font_name, display_width / 2, 25)
         pygame.display.flip()
         clock.tick(60)
+    pygame.mixer.music.stop()
     savescore(depth)
+    you_dead(deathvia, depth)
+
+
+def you_dead(deathvia, depth):
+    pygame.init()
+    display_width = 960
+    display_height = 540
+    white = (255, 255, 255)
+    reaperbackgrounds = ['Assets/Backgrounds/loadingscreen1.jpg',
+                         'Assets/Backgrounds/loadingscreen2.jpg',
+                         'Assets/Backgrounds/loadingscreen3.png']
+    ghostbackgrounds = ['Assets/Backgrounds/loadingscreen4.jpg',
+                        'Assets/Backgrounds/loadingscreen5.jpg',
+                        'Assets/Backgrounds/loadingscreen6.png']
+    if deathvia == 'Reaper':
+        background = pygame.image.load(random.choice(reaperbackgrounds))
+    elif deathvia == 'Ghost':
+        background = pygame.image.load(random.choice(ghostbackgrounds))
+    else:
+        background = pygame.image.load(random.choice(reaperbackgrounds))
+    title = pygame.image.load('Assets/General/Title.png')
+    gamedisplay = pygame.display.set_mode((display_width, display_height))
+    pygame.display.set_caption('Reaper')
+    font_name = 'Helvetica'
+    icon = pygame.image.load('Assets/General/alterra logo.png')
+    pygame.display.set_icon(icon)
+    clock = pygame.time.Clock()
+    crashed = False
+    metressurvived = 'You survived ' + str(depth) + ' metres.'
+    anybutton = 'Press any Button to Play Again'
+    fullstop = False
+    if deathvia == 'Reaper':
+        roar('Reaper')
+    else:
+        roar('Ghost')
+    while not crashed:
+        gamedisplay.blit(background, (0, 0))
+        gamedisplay.blit(title, (330, 100))
+        draw_text(gamedisplay, metressurvived, 25, white, font_name, display_width / 2, 240)
+        draw_text(gamedisplay, anybutton, 25, white, font_name, display_width / 2, 340)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                crashed = True
+                fullstop = True
+            if event.type == pygame.KEYDOWN:
+                crashed = True
+                fullstop = False
+        pygame.display.flip()
+        clock.tick(60)
+    if fullstop:
+        exit()
+    else:
+        start_menu()
 
 
 start_menu()

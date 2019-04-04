@@ -1,21 +1,31 @@
 <component name="ProjectDictionaryState">
   <dictionary name="liam_seagram">
     <words>
+      <w>activateleviathans</w>
+      <w>activeamount</w>
+      <w>activeamountint</w>
+      <w>activedoc</w>
+      <w>activeleviathans</w>
       <w>alterra</w>
+      <w>amountactive</w>
       <w>angleseasy</w>
       <w>angleshard</w>
+      <w>anybutton</w>
       <w>backheight</w>
       <w>backwidth</w>
       <w>bglist</w>
       <w>clickto</w>
+      <w>deathvia</w>
       <w>depthpaths</w>
       <w>depthpathslist</w>
       <w>depthpathslistforeal</w>
       <w>exitgame</w>
       <w>fontdir</w>
+      <w>fullstop</w>
       <w>gamedisplay</w>
       <w>getbackground</w>
       <w>getscore</w>
+      <w>ghostbackgrounds</w>
       <w>handlekeys</w>
       <w>highscore</w>
       <w>iconsmall</w>
@@ -23,14 +33,24 @@
       <w>imagemove</w>
       <w>imageright</w>
       <w>lastkey</w>
+      <w>leftorright</w>
       <w>leviathanattributes</w>
       <w>leviathanchance</w>
+      <w>leviathansactive</w>
       <w>leviathantype</w>
+      <w>levspeed</w>
+      <w>levxpos</w>
+      <w>levypos</w>
+      <w>loadingscreen</w>
       <w>maingame</w>
+      <w>metressurvived</w>
       <w>midtop</w>
       <w>pygame</w>
+      <w>reaperbackgrounds</w>
+      <w>roartype</w>
       <w>roundeddepth</w>
       <w>savescore</w>
+      <w>scoresaved</w>
       <w>seamoth</w>
       <w>speedseasy</w>
       <w>speedshard</w>
