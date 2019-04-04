@@ -122,7 +122,8 @@ def leviathanattributes(depth):
     speedshard = [16, 18, 20]
     levtypes1 = ['Reaper', 'Reaper', 'Ghost']
     levtypes2 = ['Ghost', 'Ghost', 'Reaper']
-    # all the attributes that will be randomly chosen are put in lists,
+    # all the attributes that will be randomly chosen are put in lists, which then can be randomly drawn from
+    # based on the depth.
     if depth < 150:
         speed = random.choice(speedseasy)
         angle = random.choice(angleseasy)
@@ -148,23 +149,44 @@ def leviathanattributes(depth):
         angle = random.choice(angleshard)
         leviathantype = 'Ghost'
     return [speed, angle, leviathantype]
+    # returns the three selected attributes back to the function's call origin
+
+
+'''
+The function below is a simple function that plays a roar sound effect based on what type of roar is inputted as the
+parameter (the ghost's roar or the reaper's roar).
+'''
 
 
 def roar(roartype):
     reaper_roar = pygame.mixer.Sound("Assets/SoundEffects/Reaper Roar.wav")
     ghost_roar = pygame.mixer.Sound("Assets/SoundEffects/Ghost Roar.wav")
+    # defining variables aas the sound effects
     if roartype == 'Reaper':
         pygame.mixer.Sound.play(reaper_roar)
         pygame.mixer.music.stop()
     elif roartype == 'Ghost':
         pygame.mixer.Sound.play(ghost_roar)
         pygame.mixer.music.stop()
+    # playing the sound effects based on the parameter
+
+
+'''
+This simple function opens the text document that the game's highscore is stored in, and returns it as an integer
+to the function's call location
+'''
 
 
 def getscore():
     stored = open('Highscore', 'r')
     score = stored.read().strip()
     return int(score)
+
+
+'''
+This is another simple function that takes in the current score as a parameter from where it is called, checks if that
+score is above the highscore, and if it is, replaces the highscore with the current score.
+'''
 
 
 def savescore(score):
@@ -174,6 +196,16 @@ def savescore(score):
         stored.write(str(score))
 
 
+'''
+The below function is used to find the backgrounds that appear throughout the game as you progress. When it is called,
+It takes in two parameters, the current depth, and 'iteration', which will be a random number between 0 and 3.
+The function opens the text document where all the paths are stored, and splits them along a question mark, which will
+make a list of all the paths split by depth category. It then splits each piece of the list again by all the \ns which
+got carried in with the background directories file, making a 2d list of categories and directories that can be
+targeted accordingly.
+'''
+
+
 def getbackground(depth, iteration):
     depthpaths = open('BackgroundDirectories', "r")
     depthpathslist = depthpaths.read()
@@ -181,6 +213,7 @@ def getbackground(depth, iteration):
     bglist = []
     for i in depthpathslist:
         bglist.append(i.split("\n"))
+    # opens the text file, and creates the 2d list, as defined above
     if depth < 100:
         background = pygame.image.load(bglist[0][iteration])
     elif 100 < depth < 200:
@@ -197,57 +230,103 @@ def getbackground(depth, iteration):
         background = pygame.image.load(bglist[5][iteration + 1])
     else:
         background = pygame.image.load(bglist[0][iteration + 1])
+        # gets the proper background based on the depth and iteration parameters
     background = pygame.transform.scale(background, (960, 540))
+    # transforms the background to scale to the game size
     return background
+    # returns the chosen background to the function call
 
 
-def draw_text(surf, text, size, white, font_name, x, y):
+'''
+The following function is used to draw text on the desired surface you would like to draw text upon. It takes in
+multiple variables: the surface, the text contents, the text size, the text color, the font name, and the position.
+It then uses those parameters to draw up the text, and blit it to the desired surface.
+'''
+
+
+def draw_text(surf, text, size, color, font_name, x, y):
     font = pygame.font.SysFont(font_name, size)
-    text_surface = font.render(text, True, white)
+    # finds the font and loads it with the proper size
+    text_surface = font.render(text, True, color)
+    # renders the font with the text and color
     text_rect = text_surface.get_rect()
+    # finds the size of the rendered text
     text_rect.midtop = (x, y)
+    # places the text with x and y in the middle top
     surf.blit(text_surface, text_rect)
+    # blits the text to the surface
+
+
+'''
+The following function is one of the three main interface functions for my code: the start menu. it displays a start
+screen when the code is run, which displays the highscore, as well as the game's name and a cool background. the player
+must press any button to begin the game when this screen is up.
+'''
 
 
 def start_menu():
     pygame.init()
+    # initializing pygame
     display_width = 960
     display_height = 540
+    # defining the display width and height as variables so they can be referenced multiple times in the code
     white = (255, 255, 255)
+    # defining white's RGB color code
     backgrounds = ['Assets/Backgrounds/loadingscreen1.jpg',
                    'Assets/Backgrounds/loadingscreen2.jpg',
                    'Assets/Backgrounds/loadingscreen3.png',
-                   'Assets/Backgrounds/loadingscreen4.jpg']
+                   'Assets/Backgrounds/loadingscreen4.jpg',
+                   'Assets/Backgrounds/loadingscreen5.jpg',
+                   'Assets/Backgrounds/loadingscreen6.png']
+    # creating a list of possible loading screens
     background = pygame.image.load(random.choice(backgrounds))
+    # picks one of the possible loading screens to be the background for the starting menu
     pygame.mixer.music.load('Assets/SoundEffects/Salutations.mp3')
     pygame.mixer.music.play(-1)
+    # loads and plays the menu music
     title = pygame.image.load('Assets/General/Title.png')
     start = pygame.image.load('Assets/General/ClicktoStart.png')
     highscore = pygame.image.load('Assets/General/Highscore.png')
+    # loads the three images that will be blitted onto the menu
     gamedisplay = pygame.display.set_mode((display_width, display_height))
+    # defines the game display size
     pygame.display.set_caption('Reaper')
+    # sets the display caption
     font_name = 'Helvetica'
+    # big surprise, we're using helvetica (i couldn't get my custom font to work properly)
     icon = pygame.image.load('Assets/General/alterra logo.png')
     pygame.display.set_icon(icon)
+    # loads and sets the icon for the game
     clock = pygame.time.Clock()
+    # defines the pygame clock
     crashed = False
     exitgame = False
+    # defines both crashed and exitgame as false
     while not crashed:
+        # while crashed is false, loop is active
         gamedisplay.blit(background, (0, 0))
         gamedisplay.blit(title, (330, 100))
         gamedisplay.blit(start, (350, 300))
         gamedisplay.blit(highscore, (285, 200))
+        # blits the background and proper images onto the game display
         draw_text(gamedisplay, str(getscore()) + ' metres', 25, white, font_name, 650, 240)
+        # displays the metre highscore on the main screen
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 crashed = True
                 exitgame = True
+                # if the player presses the red x on the top corner of the screen, sets both variables to true so the
+                # code itself will exit
             if event.type == pygame.KEYDOWN:
                 crashed = True
                 exitgame = False
+                # if the player presses any key (press any key to begin) closes this windoww  and begins the next one.)
         pygame.display.flip()
+        # flips the display
         clock.tick(60)
+        # ticks the pygame clock 60
     maingame(exitgame)
+    # once the loop is broken, calls the maingame function with the parameter exitgame
 
 
 def maingame(exitgame):
