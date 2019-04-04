@@ -6,25 +6,41 @@ import pygame, random, time
 leviathansactive = 0
 # global variable is defined for how many leviathans (the enemy) are active in my game.
 
-
 '''
-The below class is created for my player sprite, the seamoth
+The below class is created for my player sprite, the seamoth. It defines the seamoth, as well as the seamoth's
+location, and orientation to be used in the pygame loop.
 '''
 
 
 class Seamoth(pygame.sprite.Sprite):
+    # the class is defined, the parameter letting the program know it is a pygame sprite
     def __init__(self, x, y, orientation):
+        # init function within the class including all parameters
         super().__init__()
+        # initiating super, which allows us to avoid directly referencing the base class (where it is specified that
+        # this class is a pygame sprite)
         self.imageleft = pygame.image.load('Assets/Sprites/seamoth.png').convert_alpha()
         self.imageleft = pygame.transform.scale(self.imageleft, (80, 46))
         self.imageright = pygame.transform.flip(self.imageleft, True, False)
+        # loads the sprite image and flips it in one variable
         if orientation:
             self.image = self.imageright
         else:
             self.image = self.imageleft
+        # uses the parameter 'orientation', which is either true or false, to determine if the image is flipped.
         self.rect = self.image.get_rect()
+        # defines the image size as self.rect
         self.rect.x = x
         self.rect.y = y
+        # defines the location of the sprite as the parameters x and y
+
+
+'''
+The below class is created for one of my enemy sprites, the Reaper Leviathan. It defines the reaper, as well as the 
+reaper's location, and orientation to be used in the pygame loop. The code is almost identical to the one in the class
+above, (the only major difference being that in this one orientation will either be a zero or a 1, instead of a true
+or a false) so I will leave it uncommented.
+'''
 
 
 class Reaper(pygame.sprite.Sprite):
@@ -42,6 +58,14 @@ class Reaper(pygame.sprite.Sprite):
         self.rect.y = y
 
 
+'''
+The below class is created for one of my enemy sprites, the Ghost Leviathan. It defines the ghost, as well as the 
+ghost's location, and orientation to be used in the pygame loop. The code is almost identical to the one in the class
+for the seamoth, (the only major difference being that in this one orientation will either be a zero or a 1, instead of a true
+or a false) so I will leave it uncommented.
+'''
+
+
 class Ghost(pygame.sprite.Sprite):
     def __init__(self, x, y, orientation):
         super().__init__()
@@ -55,6 +79,14 @@ class Ghost(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+
+
+'''
+The following function will spit out the chance a leviathan has to spawn based on the depth of the seamoth, returning
+that to where the function was called from. The chance goes up the deeper you get, as you can see in the code below.
+The reason it is so high in the beginning is because this function will be called rapidly- even though it is a 1 in
+15 chance of spawning, you will most likely see one within 5 seconds of descending past 50m.
+'''
 
 
 def leviathanchance(depth):
@@ -75,6 +107,14 @@ def leviathanchance(depth):
     return chance
 
 
+'''
+The below function takes in depth as a parameter and returns all the attributes for a leviathan about to be spawned.
+They are random for the most part, but the deeper you go the more dangerous the attributes are going to be (the 
+leviathans will be faster, move sideways at more of an angle, etc.) Also, this function defines what kind of leviathan
+will spawn, so you will see more reapers in shallow water, and more ghosts in deeper water.
+'''
+
+
 def leviathanattributes(depth):
     angleseasy = [0, 2, 4]
     angleshard = [6, 8, 12]
@@ -82,6 +122,7 @@ def leviathanattributes(depth):
     speedshard = [16, 18, 20]
     levtypes1 = ['Reaper', 'Reaper', 'Ghost']
     levtypes2 = ['Ghost', 'Ghost', 'Reaper']
+    # all the attributes that will be randomly chosen are put in lists,
     if depth < 150:
         speed = random.choice(speedseasy)
         angle = random.choice(angleseasy)

@@ -39,6 +39,7 @@
       <w>leviathansactive</w>
       <w>leviathantype</w>
       <w>levspeed</w>
+      <w>levtypes</w>
       <w>levxpos</w>
       <w>levypos</w>
       <w>loadingscreen</w>
@@ -52,8 +53,10 @@
       <w>savescore</w>
       <w>scoresaved</w>
       <w>seamoth</w>
+      <w>spawnwing</w>
       <w>speedseasy</w>
       <w>speedshard</w>
+      <w>suoer</w>
       <w>willyoudie</w>
       <w>xpos</w>
       <w>ypos</w>
