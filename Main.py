@@ -570,7 +570,9 @@ def maingame():
 
 
 '''
-The following function is the 
+The following function is the final death screen function, where it displays the depth you got to, and plays the
+roar sound effect of whichever leviathan killed you. You then press any button to continue, and it takes you back to
+the starting screen, where you can try to play again.
 '''
 
 
@@ -579,51 +581,63 @@ def you_dead(deathvia, depth):
     display_width = 960
     display_height = 540
     white = (255, 255, 255)
+    # initializing pygame, setting the background size, and defining white
     reaperbackgrounds = ['Assets/Backgrounds/loadingscreen1.jpg',
                          'Assets/Backgrounds/loadingscreen2.jpg',
                          'Assets/Backgrounds/loadingscreen3.png']
     ghostbackgrounds = ['Assets/Backgrounds/loadingscreen4.jpg',
                         'Assets/Backgrounds/loadingscreen5.jpg',
                         'Assets/Backgrounds/loadingscreen6.png']
+    # defining the backgrounds based on which leviathan killed you
     if deathvia == 'Reaper':
         background = pygame.image.load(random.choice(reaperbackgrounds))
     elif deathvia == 'Ghost':
         background = pygame.image.load(random.choice(ghostbackgrounds))
     else:
         background = pygame.image.load(random.choice(reaperbackgrounds))
+    # getting the backgrounds based on what killed you
     title = pygame.image.load('Assets/General/Title.png')
+    # loading the title image
     gamedisplay = pygame.display.set_mode((display_width, display_height))
+    # setting the game display
     pygame.display.set_caption('Reaper')
     font_name = 'Helvetica'
     icon = pygame.image.load('Assets/General/alterra logo.png')
     pygame.display.set_icon(icon)
+    # setting the caption, font name, and icon
     clock = pygame.time.Clock()
     crashed = False
+    # defining the clock and the fact that we have not, in fact, crashed
     metressurvived = 'You survived ' + str(depth) + ' metres.'
     anybutton = 'Press any Button to Play Again'
-    fullstop = False
+    # defining two strings to be printed on the screen
     if deathvia == 'Reaper':
         roar('Reaper')
     else:
         roar('Ghost')
+    # playing the roar of whichever leviathan killed you
     while not crashed:
+        # loop that displays the menu
         gamedisplay.blit(background, (0, 0))
         gamedisplay.blit(title, (330, 100))
+        # blitting the background and title to the game display
         draw_text(gamedisplay, metressurvived, 25, white, font_name, display_width / 2, 240)
         draw_text(gamedisplay, anybutton, 25, white, font_name, display_width / 2, 340)
+        # drawing the text to the screen defined in the strings above
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                crashed = True
-                fullstop = True
+                exit()
+                # if the user presses the red x, quits the code
             if event.type == pygame.KEYDOWN:
                 crashed = True
-                fullstop = False
+                # if the user presses any button, quits the loop
         pygame.display.flip()
+        # flips the display
         clock.tick(60)
-    if fullstop:
-        exit()
-    else:
-        start_menu()
+        # ticks the clock by 60
+    start_menu()
+    # once the loop has ended, calls start_menu() again, restarting the whole process from the top
 
 
 start_menu()
+# calling the start_menu() function to begin the code
